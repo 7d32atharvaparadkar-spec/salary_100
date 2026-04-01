@@ -1,0 +1,36 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+
+st.title("💼 Salary Predictor")
+
+# Load dataset
+df = pd.read_csv("salary_100.csv")
+
+# Preprocess
+df = pd.get_dummies(df, drop_first=True)
+
+X = df.drop("Salary", axis=1)
+y = df["Salary"]
+
+# Train model (inside app → no .pkl issue)
+model = LinearRegression()
+model.fit(X, y)
+
+# Inputs
+exp = st.number_input("Experience (Years)", min_value=0.0)
+
+edu = st.selectbox("Education", ["Graduate","Postgraduate","PhD"])
+
+# Encoding
+edu_post = 1 if edu == "Postgraduate" else 0
+edu_phd = 1 if edu == "PhD" else 0
+
+if st.button("Predict Salary"):
+    
+    data = np.array([[exp, edu_post, edu_phd]])
+    
+    result = model.predict(data)
+    
+    st.success(f"💰 Estimated Salary = ₹ {result[0]:,.2f}")
